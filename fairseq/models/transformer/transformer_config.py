@@ -24,36 +24,20 @@ _NAME_PARSER = r"(decoder|encoder|quant_noise)_(.*)"
 
 @dataclass
 class EncDecBaseConfig(FairseqDataclass):
-    embed_path: Optional[str] = field(
-        default=None, metadata={"help": "path to pre-trained embedding"}
-    )
-    embed_dim: Optional[int] = field(
-        default=512, metadata={"help": "embedding dimension"}
-    )
-    ffn_embed_dim: int = field(
-        default=2048, metadata={"help": "embedding dimension for FFN"}
-    )
+    embed_path: Optional[str] = field(default=None, metadata={"help": "path to pre-trained embedding"})
+    embed_dim: Optional[int] = field(default=512, metadata={"help": "embedding dimension"})
+    ffn_embed_dim: int = field(default=2048, metadata={"help": "embedding dimension for FFN"})
     layers: int = field(default=6, metadata={"help": "number of layers"})
-    attention_heads: int = field(
-        default=8, metadata={"help": "number of attention heads"}
-    )
-    normalize_before: bool = field(
-        default=False, metadata={"help": "apply layernorm before each block"}
-    )
-    learned_pos: bool = field(
-        default=False, metadata={"help": "use learned positional embeddings"}
-    )
+    attention_heads: int = field(default=8, metadata={"help": "number of attention heads"})
+    normalize_before: bool = field(default=False, metadata={"help": "apply layernorm before each block"})
+    learned_pos: bool = field(default=False, metadata={"help": "use learned positional embeddings"})
     # args for "Reducing Transformer Depth on Demand with Structured Dropout" (Fan et al., 2019)
     layerdrop: float = field(default=0, metadata={"help": "LayerDrop probability"})
-    layers_to_keep: Optional[List[int]] = field(
-        default=None, metadata={"help": "which layers to *keep* when pruning"}
-    )
+    layers_to_keep: Optional[List[int]] = field(default=None, metadata={"help": "which layers to *keep* when pruning"})
 
     xformers_att_config: Optional[str] = field(
         default=None,
-        metadata={
-            "help": "config for xFormers attention, defined in xformers.components.attention.AttentionConfig"
-        },
+        metadata={"help": "config for xFormers attention, defined in xformers.components.attention.AttentionConfig"},
     )
 
 
@@ -62,9 +46,7 @@ class DecoderConfig(EncDecBaseConfig):
     input_dim: int = II("model.decoder.embed_dim")
     output_dim: int = field(
         default=II("model.decoder.embed_dim"),
-        metadata={
-            "help": "decoder output dimension (extra linear layer if different from decoder embed dim)"
-        },
+        metadata={"help": "decoder output dimension (extra linear layer if different from decoder embed dim)"},
     )
 
     def __post_init__(self):
@@ -87,9 +69,7 @@ class QuantNoiseConfig(FairseqDataclass):
     )
     scalar: float = field(
         default=0.0,
-        metadata={
-            "help": "scalar quantization noise and scalar quantization at training time"
-        },
+        metadata={"help": "scalar quantization noise and scalar quantization at training time"},
     )
 
 
@@ -100,9 +80,7 @@ class TransformerConfig(FairseqDataclass):
         metadata={"help": "activation function to use"},
     )
     dropout: float = field(default=0.1, metadata={"help": "dropout probability"})
-    attention_dropout: float = field(
-        default=0.0, metadata={"help": "dropout probability for attention weights"}
-    )
+    attention_dropout: float = field(default=0.0, metadata={"help": "dropout probability for attention weights"})
     activation_dropout: float = field(
         default=0.0,
         metadata={
@@ -111,26 +89,22 @@ class TransformerConfig(FairseqDataclass):
         },
     )
     adaptive_input: bool = False
-    encoder: EncDecBaseConfig = EncDecBaseConfig()
+    encoder: EncDecBaseConfig = field(default=EncDecBaseConfig)
     # TODO should really be in the encoder config
     max_source_positions: int = field(
         default=DEFAULT_MAX_SOURCE_POSITIONS,
         metadata={"help": "Maximum input length supported by the encoder"},
     )
-    decoder: DecoderConfig = DecoderConfig()
+    decoder: DecoderConfig = field(default=DecoderConfig)
     # TODO should really be in the decoder config
     max_target_positions: int = field(
         default=DEFAULT_MAX_TARGET_POSITIONS,
         metadata={"help": "Maximum output length supported by the decoder"},
     )
-    share_decoder_input_output_embed: bool = field(
-        default=False, metadata={"help": "share decoder input and output embeddings"}
-    )
+    share_decoder_input_output_embed: bool = field(default=False, metadata={"help": "share decoder input and output embeddings"})
     share_all_embeddings: bool = field(
         default=False,
-        metadata={
-            "help": "share encoder, decoder and output embeddings (requires shared dictionary and embed dim)"
-        },
+        metadata={"help": "share encoder, decoder and output embeddings (requires shared dictionary and embed dim)"},
     )
     merge_src_tgt_embed: bool = field(
         default=False,
@@ -142,62 +116,40 @@ class TransformerConfig(FairseqDataclass):
     )
     no_token_positional_embeddings: bool = field(
         default=False,
-        metadata={
-            "help": "if True, disables positional embeddings (outside self attention)"
-        },
+        metadata={"help": "if True, disables positional embeddings (outside self attention)"},
     )
     adaptive_softmax_cutoff: Optional[List[int]] = field(
         default=None,
-        metadata={
-            "help": "list of adaptive softmax cutoff points. Must be used with adaptive_loss criterion"
-        },
+        metadata={"help": "list of adaptive softmax cutoff points. Must be used with adaptive_loss criterion"},
     )
     adaptive_softmax_dropout: float = field(
         default=0.0,
         metadata={"help": "sets adaptive softmax dropout for the tail projections"},
     )
-    adaptive_softmax_factor: float = field(
-        default=4, metadata={"help": "adaptive input factor"}
-    )
-    layernorm_embedding: bool = field(
-        default=False, metadata={"help": "add layernorm to embedding"}
-    )
+    adaptive_softmax_factor: float = field(default=4, metadata={"help": "adaptive input factor"})
+    layernorm_embedding: bool = field(default=False, metadata={"help": "add layernorm to embedding"})
     tie_adaptive_weights: bool = field(
         default=False,
-        metadata={
-            "help": "if set, ties the weights of adaptive softmax and adaptive input"
-        },
+        metadata={"help": "if set, ties the weights of adaptive softmax and adaptive input"},
     )
     tie_adaptive_proj: bool = field(
         default=False,
-        metadata={
-            "help": "if set, ties the projection weights of adaptive softmax and adaptive input"
-        },
+        metadata={"help": "if set, ties the projection weights of adaptive softmax and adaptive input"},
     )
-    no_scale_embedding: bool = field(
-        default=False, metadata={"help": "if True, dont scale embeddings"}
-    )
+    no_scale_embedding: bool = field(default=False, metadata={"help": "if True, dont scale embeddings"})
     checkpoint_activations: bool = field(
         default=False,
-        metadata={
-            "help": "checkpoint activations at each layer, which saves GPU memory usage at the cost of some additional compute"
-        },
+        metadata={"help": "checkpoint activations at each layer, which saves GPU memory usage at the cost of some additional compute"},
     )
     offload_activations: bool = field(
         default=False,
-        metadata={
-            "help": "checkpoint activations at each layer, then save to gpu. Sets --checkpoint-activations."
-        },
+        metadata={"help": "checkpoint activations at each layer, then save to gpu. Sets --checkpoint-activations."},
     )
     # args for "Cross+Self-Attention for Transformer Models" (Peitz et al., 2019)
-    no_cross_attention: bool = field(
-        default=False, metadata={"help": "do not perform cross-attention"}
-    )
-    cross_self_attention: bool = field(
-        default=False, metadata={"help": "perform cross+self-attention"}
-    )
+    no_cross_attention: bool = field(default=False, metadata={"help": "do not perform cross-attention"})
+    cross_self_attention: bool = field(default=False, metadata={"help": "perform cross+self-attention"})
     # args for Training with Quantization Noise for Extreme Model Compression ({Fan*, Stock*} et al., 2020)
-    quant_noise: QuantNoiseConfig = field(default=QuantNoiseConfig())
+    quant_noise: QuantNoiseConfig = field(default=QuantNoiseConfig)
     min_params_to_wrap: int = field(
         default=DEFAULT_MIN_PARAMS_TO_WRAP,
         metadata={
@@ -210,17 +162,11 @@ class TransformerConfig(FairseqDataclass):
         },
     )
     # DEPRECATED field, but some old checkpoints might have it
-    char_inputs: bool = field(
-        default=False, metadata={"help": "if set, model takes character ids as input"}
-    )
+    char_inputs: bool = field(default=False, metadata={"help": "if set, model takes character ids as input"})
     relu_dropout: float = 0.0
     # config for "BASE Layers: Simplifying Training of Large, Sparse Models"
-    base_layers: Optional[int] = field(
-        default=0, metadata={"help": "number of BASE layers in total"}
-    )
-    base_sublayers: Optional[int] = field(
-        default=1, metadata={"help": "number of sublayers in each BASE layer"}
-    )
+    base_layers: Optional[int] = field(default=0, metadata={"help": "number of BASE layers in total"})
+    base_sublayers: Optional[int] = field(default=1, metadata={"help": "number of sublayers in each BASE layer"})
     base_shuffle: Optional[int] = field(
         default=1,
         metadata={"help": "shuffle tokens between workers before computing assignment"},
@@ -297,27 +243,21 @@ class TransformerConfig(FairseqDataclass):
                         seen.add("decoder")
                         config.decoder = DecoderConfig(**args.decoder)
                     else:
-                        config.decoder = cls._copy_keys(
-                            args, DecoderConfig, "decoder", seen
-                        )
+                        config.decoder = cls._copy_keys(args, DecoderConfig, "decoder", seen)
                 elif fld.name == "encoder":
                     # same but for encoder
                     if safe_hasattr(args, "encoder"):
                         seen.add("encoder")
                         config.encoder = EncDecBaseConfig(**args.encoder)
                     else:
-                        config.encoder = cls._copy_keys(
-                            args, EncDecBaseConfig, "encoder", seen
-                        )
+                        config.encoder = cls._copy_keys(args, EncDecBaseConfig, "encoder", seen)
                 elif fld.name == "quant_noise":
                     # same but for quant_noise
                     if safe_hasattr(args, "quant_noise"):
                         seen.add("quant_noise")
                         config.quant_noise = QuantNoiseConfig(**args.quant_noise)
                     else:
-                        config.quant_noise = cls._copy_keys(
-                            args, QuantNoiseConfig, "quant_noise", seen
-                        )
+                        config.quant_noise = cls._copy_keys(args, QuantNoiseConfig, "quant_noise", seen)
                 elif safe_hasattr(args, fld.name):
                     # if it's not a structure field, it's just a normal field, copy it over
                     seen.add(fld.name)
@@ -327,11 +267,7 @@ class TransformerConfig(FairseqDataclass):
             #   - we are in a legacy class so all the args are not declared in the dataclass. Ideally once everyone has defined a dataclass for their model, we won't need this
             #   - some places expect args to be there but never define them
             args_dict = (
-                args._asdict()
-                if safe_hasattr(args, "_asdict")
-                else vars(args)
-                if safe_hasattr(args, "__dict__")
-                else {}
+                args._asdict() if safe_hasattr(args, "_asdict") else vars(args) if safe_hasattr(args, "__dict__") else {}
             )  # namedtupled doesn't have __dict__ :-/
             for key, value in args_dict.items():
                 if key not in seen:

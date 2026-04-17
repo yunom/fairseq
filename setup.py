@@ -138,9 +138,7 @@ if "READTHEDOCS" in os.environ:
         del cmdclass["build_ext"]
 
     # use CPU build of PyTorch
-    dependency_links = [
-        "https://download.pytorch.org/whl/cpu/torch-1.7.0%2Bcpu-cp36-cp36m-linux_x86_64.whl"
-    ]
+    dependency_links = ["https://download.pytorch.org/whl/cpu/torch-1.7.0%2Bcpu-cp36-cp36m-linux_x86_64.whl"]
 else:
     dependency_links = []
 
@@ -179,8 +177,8 @@ def do_setup(package_data):
         install_requires=[
             "cffi",
             "cython",
-            "hydra-core>=1.0.7,<1.1",
-            "omegaconf<2.1",
+            "hydra-core>=1.3.2",
+            "omegaconf",
             "numpy>=1.21.3",
             "regex",
             "sacrebleu>=1.4.12",
@@ -245,12 +243,7 @@ if __name__ == "__main__":
         if "build_ext" not in sys.argv[1:] and not os.path.exists(fairseq_examples):
             os.symlink(os.path.join("..", "examples"), fairseq_examples)
 
-        package_data = {
-            "fairseq": (
-                get_files(fairseq_examples)
-                + get_files(os.path.join("fairseq", "config"))
-            )
-        }
+        package_data = {"fairseq": (get_files(fairseq_examples) + get_files(os.path.join("fairseq", "config")))}
         do_setup(package_data)
     finally:
         if "build_ext" not in sys.argv[1:] and os.path.islink(fairseq_examples):
